@@ -1,0 +1,14 @@
+#cloude-config
+hostname: ruo-vm
+
+users:
+  - name: medina
+    groups: [sudo]
+    shell: /bin/bash
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+    lock_passwd: true
+    ssh_authorized_keys: 
+      - ${ssh_key}
+
+ssh_pwauth: false
+disable_root: true

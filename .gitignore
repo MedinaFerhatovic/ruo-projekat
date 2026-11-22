@@ -1,0 +1,19 @@
+# Terraform lokalni podaci
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+
+# Lokalne postavke
+.env
+.env.*
+!.env.example
+.vault_pass
+*.pem
+*.key
+ruo_projekat
+vault.yml
+
+# Diskovi virtuelnih masina
+*.qcow2
+*.iso
