@@ -1,4 +1,4 @@
-# Automatizovana isporuka troslojne aplikacije
+# Troslojna aplikacija kao kod - projekat
 
 **Predmet:** Računarstvo u oblaku - 2026/27  
 **Studentica:** Medina Ferhatović  
