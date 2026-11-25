@@ -1,0 +1,8 @@
+dns_a_record_set.services["db"]: Refreshing state... [id=db.ruo.test.]
+dns_a_record_set.services["api"]: Refreshing state... [id=api.ruo.test.]
+dns_a_record_set.services["web"]: Refreshing state... [id=web.ruo.test.]
+
+No changes. Your infrastructure matches the configuration.
+
+Terraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.

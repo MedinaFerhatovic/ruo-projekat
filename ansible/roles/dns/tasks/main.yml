@@ -1,0 +1,96 @@
+---
+- name: Instaliraj BIND i DNS alate
+  ansible.builtin.apt:
+    name:
+      - bind9
+      - bind9-utils
+      - dnsutils
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Pokreni BIND i ukljuci automatsko pokretanje
+  ansible.builtin.service:
+    name: named
+    state: started
+    enabled: true
+
+- name: Postavi osnovne DNS opcije
+  ansible.builtin.template:
+    src: named.conf.options.j2
+    dest: /etc/bind/named.conf.options
+    owner: root
+    group: bind
+    mode: "0644"
+  notify: Restartuj BIND
+
+- name: Napravi pocetni fajl DNS zone
+  ansible.builtin.template:
+    src: db.ruo.test.j2
+    dest: /var/lib/bind/db.ruo.test
+    owner: bind
+    group: bind
+    mode: "0644"
+    force: false
+  notify: Restartuj BIND
+
+- name: Generisi TSIG kljuc samo ako ne postoji
+  ansible.builtin.shell: |
+    umask 077
+    tsig-keygen -a hmac-sha256 ruo-tf > /etc/bind/ruo-tf.key
+  args:
+    creates: /etc/bind/ruo-tf.key 
+  no_log: true
+  notify: Restartuj BIND
+
+- name: Postavi dozvole za TSIG kljuc
+  ansible.builtin.file:
+    path: /etc/bind/ruo-tf.key 
+    owner: root
+    group: bind
+    mode: "0640"
+  notify: Restartuj BIND
+
+- name: Registruj DNS zonu
+  ansible.builtin.template:
+    src: named.conf.local.j2
+    dest: /etc/bind/named.conf.local
+    owner: root
+    group: bind
+    mode: "0644"
+  notify: Restartuj BIND
+
+- name: Provjeri BIND konfiguraciju
+  ansible.builtin.command: named-checkconf
+  changed_when: false
+
+- name: Provjeri DNS zonu
+  ansible.builtin.command: named-checkzone ruo.test /var/lib/bind/db.ruo.test
+  changed_when: false
+
+- name: Ukloni kljuc napravljen na pogresnoj putanji
+  ansible.builtin.file:
+    path: /etc/bind.ruo-tf.key
+    state: absent
+
+- name: Napravi lokalni folder za tajne
+  ansible.builtin.file:
+    path: "{{ lookup('env', 'HOME') }}/.config/ruo"
+    state: directory
+    mode: "0700"
+  delegate_to: localhost
+  become: false
+
+- name: Preuzmi TSIG kljuc za Terraform
+  ansible.builtin.fetch:
+    src: /etc/bind/ruo-tf.key
+    dest: "{{ lookup('env', 'HOME') }}/.config/ruo/ruo-tf.key"
+    flat: true
+  no_log: true
+
+- name: Zastiti lokalni TSIG kljuc
+  ansible.builtin.file:
+    path: "{{ lookup('env', 'HOME') }}/.config/ruo/ruo-tf.key"
+    mode: "0600"
+  delegate_to: localhost
+  become: false

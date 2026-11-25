@@ -1,0 +1,6 @@
+USPJEH: api.ruo.test -> 172.28.20.20
+USPJEH: db.ruo.test -> 172.28.30.20
+USPJEH: web.ruo.test -> 192.168.122.248
+USPJEH: frontend odgovara
+USPJEH: API vraca JSON listu korisnika
+USPJEH: svi testovi servisa su prosli

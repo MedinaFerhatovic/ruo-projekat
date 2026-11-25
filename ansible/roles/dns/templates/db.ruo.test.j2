@@ -1,0 +1,14 @@
+$TTL 300
+$ORIGIN ruo.test.
+
+@ IN SOA ns.ruo.test. admin.ruo.test. (
+    2026112501
+    3600
+    900
+    604800
+    300
+)
+
+@  IN NS ns.ruo.test.
+ns IN A  {{ ansible_facts['default_ipv4']['address'] }}
+

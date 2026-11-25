@@ -1,0 +1,15 @@
+---
+- name: Instaliraj Docker i Compose
+  ansible.builtin.apt:
+    name:
+      - docker.io
+      - docker-compose-v2
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Pokreni Docker i ukljuci automatsko pokretanje
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true

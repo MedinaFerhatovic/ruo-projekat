@@ -1,0 +1,190 @@
+terraform -chdir=terraform/dns destroy -auto-approve -input=false
+[0m[1mdns_a_record_set.services["api"]: Refreshing state... [id=api.ruo.test.][0m
+[0m[1mdns_a_record_set.services["web"]: Refreshing state... [id=web.ruo.test.][0m
+[0m[1mdns_a_record_set.services["db"]: Refreshing state... [id=db.ruo.test.][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [31m-[0m destroy[0m
+
+Terraform will perform the following actions:
+
+[1m  # dns_a_record_set.services["api"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "dns_a_record_set" "services" {
+      [31m-[0m[0m addresses = [
+          [31m-[0m[0m "172.28.20.20",
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m id        = "api.ruo.test." [90m-> null[0m[0m
+      [31m-[0m[0m name      = "api" [90m-> null[0m[0m
+      [31m-[0m[0m ttl       = 300 [90m-> null[0m[0m
+      [31m-[0m[0m zone      = "ruo.test." [90m-> null[0m[0m
+    }
+
+[1m  # dns_a_record_set.services["db"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "dns_a_record_set" "services" {
+      [31m-[0m[0m addresses = [
+          [31m-[0m[0m "172.28.30.20",
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m id        = "db.ruo.test." [90m-> null[0m[0m
+      [31m-[0m[0m name      = "db" [90m-> null[0m[0m
+      [31m-[0m[0m ttl       = 300 [90m-> null[0m[0m
+      [31m-[0m[0m zone      = "ruo.test." [90m-> null[0m[0m
+    }
+
+[1m  # dns_a_record_set.services["web"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "dns_a_record_set" "services" {
+      [31m-[0m[0m addresses = [
+          [31m-[0m[0m "192.168.122.192",
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m id        = "web.ruo.test." [90m-> null[0m[0m
+      [31m-[0m[0m name      = "web" [90m-> null[0m[0m
+      [31m-[0m[0m ttl       = 300 [90m-> null[0m[0m
+      [31m-[0m[0m zone      = "ruo.test." [90m-> null[0m[0m
+    }
+
+[1mPlan:[0m [0m0 to add, 0 to change, 3 to destroy.
+
+Changes to Outputs:
+  [31m-[0m[0m service_names = [
+      [31m-[0m[0m "api.ruo.test",
+      [31m-[0m[0m "db.ruo.test",
+      [31m-[0m[0m "web.ruo.test",
+    ] [90m-> null[0m[0m
+[0m[1mdns_a_record_set.services["db"]: Destroying... [id=db.ruo.test.][0m[0m
+[0m[1mdns_a_record_set.services["web"]: Destroying... [id=web.ruo.test.][0m[0m
+[0m[1mdns_a_record_set.services["api"]: Destroying... [id=api.ruo.test.][0m[0m
+[0m[1mdns_a_record_set.services["db"]: Destruction complete after 0s[0m
+[0m[1mdns_a_record_set.services["api"]: Destruction complete after 0s[0m
+[0m[1mdns_a_record_set.services["web"]: Destruction complete after 0s[0m
+[0m[1m[32m
+Destroy complete! Resources: 3 destroyed.[0m
+terraform -chdir=terraform/vm destroy -auto-approve -input=false
+[0m[1mlibvirt_volume.base: Refreshing state... [id=/var/lib/libvirt/images/ruo-vm-base.qcow2][0m
+[0m[1mlibvirt_cloudinit_disk.init: Refreshing state... [id=/var/lib/libvirt/images/ruo-vm-init.iso;3a321ce8-932d-4019-ac03-18afd8465478][0m
+[0m[1mlibvirt_volume.disk: Refreshing state... [id=/var/lib/libvirt/images/ruo-vm-disk.qcow2][0m
+[0m[1mlibvirt_domain.vm: Refreshing state... [id=e7e81b97-29d1-4726-8006-068892096c2d][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [31m-[0m destroy[0m
+
+Terraform will perform the following actions:
+
+[1m  # libvirt_cloudinit_disk.init[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "libvirt_cloudinit_disk" "init" {
+      [31m-[0m[0m id             = "/var/lib/libvirt/images/ruo-vm-init.iso;3a321ce8-932d-4019-ac03-18afd8465478" [90m-> null[0m[0m
+      [31m-[0m[0m name           = "ruo-vm-init.iso" [90m-> null[0m[0m
+      [31m-[0m[0m pool           = "default" [90m-> null[0m[0m
+      [31m-[0m[0m user_data      = <<-EOT
+            #cloud-config
+            hostname: ruo-vm
+            
+            users:
+              - name: medina
+                groups: [sudo]
+                shell: /bin/bash
+                sudo: "ALL=(ALL) NOPASSWD:ALL"
+                lock_passwd: true
+                ssh_authorized_keys: 
+                  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGrukMFnpT5vNFZ886UR+M3dtjtBdImehJxM8fgtXZ8M ruo-projekat
+            
+            ssh_pwauth: false
+            disable_root: true
+        EOT [90m-> null[0m[0m
+        [90m# (2 unchanged attributes hidden)[0m[0m
+    }
+
+[1m  # libvirt_domain.vm[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "libvirt_domain" "vm" {
+      [31m-[0m[0m arch        = "x86_64" [90m-> null[0m[0m
+      [31m-[0m[0m autostart   = false [90m-> null[0m[0m
+      [31m-[0m[0m cloudinit   = "/var/lib/libvirt/images/ruo-vm-init.iso;3a321ce8-932d-4019-ac03-18afd8465478" [90m-> null[0m[0m
+      [31m-[0m[0m cmdline     = [] [90m-> null[0m[0m
+      [31m-[0m[0m emulator    = "/usr/bin/qemu-system-x86_64" [90m-> null[0m[0m
+      [31m-[0m[0m fw_cfg_name = "opt/com.coreos/config" [90m-> null[0m[0m
+      [31m-[0m[0m id          = "e7e81b97-29d1-4726-8006-068892096c2d" [90m-> null[0m[0m
+      [31m-[0m[0m machine     = "pc" [90m-> null[0m[0m
+      [31m-[0m[0m memory      = 4096 [90m-> null[0m[0m
+      [31m-[0m[0m name        = "ruo-vm" [90m-> null[0m[0m
+      [31m-[0m[0m qemu_agent  = false [90m-> null[0m[0m
+      [31m-[0m[0m running     = true [90m-> null[0m[0m
+      [31m-[0m[0m type        = "qemu" [90m-> null[0m[0m
+      [31m-[0m[0m vcpu        = 2 [90m-> null[0m[0m
+        [90m# (3 unchanged attributes hidden)[0m[0m
+
+      [31m-[0m[0m console {
+          [31m-[0m[0m source_host    = "127.0.0.1" [90m-> null[0m[0m
+          [31m-[0m[0m source_service = "0" [90m-> null[0m[0m
+          [31m-[0m[0m target_port    = "0" [90m-> null[0m[0m
+          [31m-[0m[0m target_type    = "serial" [90m-> null[0m[0m
+          [31m-[0m[0m type           = "pty" [90m-> null[0m[0m
+            [90m# (1 unchanged attribute hidden)[0m[0m
+        }
+
+      [31m-[0m[0m cpu {
+          [31m-[0m[0m mode = "custom" [90m-> null[0m[0m
+        }
+
+      [31m-[0m[0m disk {
+          [31m-[0m[0m scsi         = false [90m-> null[0m[0m
+          [31m-[0m[0m volume_id    = "/var/lib/libvirt/images/ruo-vm-disk.qcow2" [90m-> null[0m[0m
+            [90m# (4 unchanged attributes hidden)[0m[0m
+        }
+
+      [31m-[0m[0m network_interface {
+          [31m-[0m[0m addresses      = [
+              [31m-[0m[0m "192.168.122.192",
+            ] [90m-> null[0m[0m
+          [31m-[0m[0m hostname       = "ruo-vm" [90m-> null[0m[0m
+          [31m-[0m[0m mac            = "52:54:00:6E:0C:8A" [90m-> null[0m[0m
+          [31m-[0m[0m network_id     = "69ff6c82-ee6f-41fd-ab7e-4b183815c1d7" [90m-> null[0m[0m
+          [31m-[0m[0m network_name   = "default" [90m-> null[0m[0m
+          [31m-[0m[0m wait_for_lease = true [90m-> null[0m[0m
+            [90m# (5 unchanged attributes hidden)[0m[0m
+        }
+    }
+
+[1m  # libvirt_volume.base[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "libvirt_volume" "base" {
+      [31m-[0m[0m format = "qcow2" [90m-> null[0m[0m
+      [31m-[0m[0m id     = "/var/lib/libvirt/images/ruo-vm-base.qcow2" [90m-> null[0m[0m
+      [31m-[0m[0m name   = "ruo-vm-base.qcow2" [90m-> null[0m[0m
+      [31m-[0m[0m pool   = "default" [90m-> null[0m[0m
+      [31m-[0m[0m size   = 3758096384 [90m-> null[0m[0m
+      [31m-[0m[0m source = "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img" [90m-> null[0m[0m
+    }
+
+[1m  # libvirt_volume.disk[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "libvirt_volume" "disk" {
+      [31m-[0m[0m base_volume_id = "/var/lib/libvirt/images/ruo-vm-base.qcow2" [90m-> null[0m[0m
+      [31m-[0m[0m format         = "qcow2" [90m-> null[0m[0m
+      [31m-[0m[0m id             = "/var/lib/libvirt/images/ruo-vm-disk.qcow2" [90m-> null[0m[0m
+      [31m-[0m[0m name           = "ruo-vm-disk.qcow2" [90m-> null[0m[0m
+      [31m-[0m[0m pool           = "default" [90m-> null[0m[0m
+      [31m-[0m[0m size           = 26843545600 [90m-> null[0m[0m
+    }
+
+[1mPlan:[0m [0m0 to add, 0 to change, 4 to destroy.
+
+Changes to Outputs:
+  [31m-[0m[0m vm_addresses = [
+      [31m-[0m[0m "192.168.122.192",
+    ] [90m-> null[0m[0m
+  [31m-[0m[0m vm_name      = "ruo-vm" [90m-> null[0m[0m
+[0m[1mlibvirt_domain.vm: Destroying... [id=e7e81b97-29d1-4726-8006-068892096c2d][0m[0m
+[0m[1mlibvirt_domain.vm: Destruction complete after 1s[0m
+[0m[1mlibvirt_cloudinit_disk.init: Destroying... [id=/var/lib/libvirt/images/ruo-vm-init.iso;3a321ce8-932d-4019-ac03-18afd8465478][0m[0m
+[0m[1mlibvirt_volume.disk: Destroying... [id=/var/lib/libvirt/images/ruo-vm-disk.qcow2][0m[0m
+[0m[1mlibvirt_volume.disk: Destruction complete after 1s[0m
+[0m[1mlibvirt_cloudinit_disk.init: Destruction complete after 1s[0m
+[0m[1mlibvirt_volume.base: Destroying... [id=/var/lib/libvirt/images/ruo-vm-base.qcow2][0m[0m
+[0m[1mlibvirt_volume.base: Destruction complete after 0s[0m
+[0m[1m[32m
+Destroy complete! Resources: 4 destroyed.[0m
+if [ -f .runtime/vm-ip ]; then ssh-keygen -R "$(cat .runtime/vm-ip)" || true; fi
+# Host 192.168.122.192 found: line 1
+# Host 192.168.122.192 found: line 2
+# Host 192.168.122.192 found: line 3
+/home/medina/.ssh/known_hosts updated.
+Original contents retained as /home/medina/.ssh/known_hosts.old
+rm -f ansible/inventory.ini terraform/dns/runtime.auto.tfvars.json .runtime/vm-ip

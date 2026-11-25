@@ -1,0 +1,66 @@
+
+PLAY [Pripremi server za aplikaciju] *******************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [ruo-vm]
+
+TASK [docker : Instaliraj Docker i Compose] ************************************
+ok: [ruo-vm]
+
+TASK [docker : Pokreni Docker i ukljuci automatsko pokretanje] *****************
+ok: [ruo-vm]
+
+TASK [dns : Instaliraj BIND i DNS alate] ***************************************
+ok: [ruo-vm]
+
+TASK [dns : Pokreni BIND i ukljuci automatsko pokretanje] **********************
+ok: [ruo-vm]
+
+TASK [dns : Postavi osnovne DNS opcije] ****************************************
+ok: [ruo-vm]
+
+TASK [dns : Napravi pocetni fajl DNS zone] *************************************
+ok: [ruo-vm]
+
+TASK [dns : Generisi TSIG kljuc samo ako ne postoji] ***************************
+ok: [ruo-vm]
+
+TASK [dns : Postavi dozvole za TSIG kljuc] *************************************
+ok: [ruo-vm]
+
+TASK [dns : Registruj DNS zonu] ************************************************
+ok: [ruo-vm]
+
+TASK [dns : Provjeri BIND konfiguraciju] ***************************************
+ok: [ruo-vm]
+
+TASK [dns : Provjeri DNS zonu] *************************************************
+ok: [ruo-vm]
+
+TASK [dns : Ukloni kljuc napravljen na pogresnoj putanji] **********************
+ok: [ruo-vm]
+
+TASK [dns : Napravi lokalni folder za tajne] ***********************************
+ok: [ruo-vm -> localhost]
+
+TASK [dns : Preuzmi TSIG kljuc za Terraform] ***********************************
+ok: [ruo-vm]
+
+TASK [dns : Zastiti lokalni TSIG kljuc] ****************************************
+ok: [ruo-vm -> localhost]
+
+TASK [app : Napravi direktorij aplikacije] *************************************
+ok: [ruo-vm]
+
+TASK [app : Prenesi aplikaciju na server] **************************************
+ok: [ruo-vm]
+
+TASK [app : Generisi i postavi konfiguraciju aplikacije] ***********************
+ok: [ruo-vm]
+
+TASK [app : Izgradi slike i pokreni aplikaciju] ********************************
+ok: [ruo-vm]
+
+PLAY RECAP *********************************************************************
+ruo-vm                     : ok=20   changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+

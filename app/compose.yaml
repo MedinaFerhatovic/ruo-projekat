@@ -1,0 +1,83 @@
+name: ruo
+
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    dns: 
+     - ${DNS_SERVER_IP:?Nedostaje DNS_SERVER_IP}
+    depends_on:
+      - backend
+    networks:
+      web:
+        ipv4_address: 172.28.10.10
+      app:
+        ipv4_address: 172.28.20.10
+  
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      MYSQL_HOST: db.ruo.test
+      MYSQL_USER: crud_user
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Nedostaje MYSQL_PASSWORD}
+      MYSQL_DATABASE: cruddb
+    dns:
+      - ${DNS_SERVER_IP:?Nedostaje DNS_SERVER_IP}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    sysctls:
+      net.ipv4.ip_forward: "0"
+    networks:
+      app:
+        ipv4_address: 172.28.20.20
+      db:
+        ipv4_address: 172.28.30.10
+  
+  mysql:
+    image: mysql:8.0.46-debian
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Nedostaje MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: cruddb
+      MYSQL_USER: crud_user
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Nedostaje MYSQL_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          MYSQL_PWD="$${MYSQL_PASSWORD}"
+          mysql --protocol=TCP -h127.0.0.1
+          -u"$${MYSQL_USER}" "$${MYSQL_DATABASE}"
+          -e "SELECT 1 FROM users LIMIT 1"
+          >/dev/null 2>&1
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 120s
+    networks:
+      db:
+        ipv4_address: 172.28.30.20
+
+volumes:
+  mysql_data:
+
+networks:
+  web:
+    ipam:
+      config:
+        - subnet: 172.28.10.0/24
+  app:
+    ipam:
+      config:
+        - subnet: 172.28.20.0/24
+  db:
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.28.30.0/24

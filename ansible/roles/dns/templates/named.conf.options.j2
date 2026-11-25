@@ -1,0 +1,16 @@
+options {
+    directory "/var/cache/bind";
+
+    listen-on { any; };
+    listen-on-v6 { none; };
+
+    recursion no;
+
+    allow-query {
+        localhost;
+        192.168.122.0/24;
+        172.28.0.0/16;
+    };
+
+    allow-transfer { none; };
+};

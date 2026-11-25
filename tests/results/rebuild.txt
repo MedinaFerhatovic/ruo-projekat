@@ -1,0 +1,424 @@
+make check
+make[1]: Entering directory '/home/medina/ruo-projekat'
+virsh -c qemu:///system pool-info default
+Name:           default
+UUID:           2b843356-b4b0-4182-ab5a-f3b7c9f1b401
+State:          running
+Persistent:     yes
+Autostart:      yes
+Capacity:       1006.85 GiB
+Allocation:     2.81 GiB
+Available:      1004.04 GiB
+
+virsh -c qemu:///system net-info default
+Name:           default
+UUID:           69ff6c82-ee6f-41fd-ab7e-4b183815c1d7
+Active:         yes
+Persistent:     yes
+Autostart:      yes
+Bridge:         virbr0
+
+make[1]: Leaving directory '/home/medina/ruo-projekat'
+make infra
+make[1]: Entering directory '/home/medina/ruo-projekat'
+terraform -chdir=terraform/vm init -input=false
+[0m[1mInitializing the backend...[0m
+
+[0m[1mInitializing provider plugins...[0m
+- Reusing version 0.8.3 of dmacvicar/libvirt from the dependency lock file
+- Using previously-installed dmacvicar/libvirt v0.8.3
+
+[0m[1m[32mTerraform has been successfully initialized![0m[32m[0m
+[0m[32m
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.[0m
+terraform -chdir=terraform/vm apply -auto-approve -input=false
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [32m+[0m create[0m
+
+Terraform will perform the following actions:
+
+[1m  # libvirt_cloudinit_disk.init[0m will be created
+[0m  [32m+[0m[0m resource "libvirt_cloudinit_disk" "init" {
+      [32m+[0m[0m id        = (known after apply)
+      [32m+[0m[0m name      = "ruo-vm-init.iso"
+      [32m+[0m[0m pool      = "default"
+      [32m+[0m[0m user_data = <<-EOT
+            #cloud-config
+            hostname: ruo-vm
+            
+            users:
+              - name: medina
+                groups: [sudo]
+                shell: /bin/bash
+                sudo: "ALL=(ALL) NOPASSWD:ALL"
+                lock_passwd: true
+                ssh_authorized_keys: 
+                  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGrukMFnpT5vNFZ886UR+M3dtjtBdImehJxM8fgtXZ8M ruo-projekat
+            
+            ssh_pwauth: false
+            disable_root: true
+        EOT
+    }
+
+[1m  # libvirt_domain.vm[0m will be created
+[0m  [32m+[0m[0m resource "libvirt_domain" "vm" {
+      [32m+[0m[0m arch        = (known after apply)
+      [32m+[0m[0m autostart   = (known after apply)
+      [32m+[0m[0m cloudinit   = (known after apply)
+      [32m+[0m[0m emulator    = (known after apply)
+      [32m+[0m[0m fw_cfg_name = "opt/com.coreos/config"
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m machine     = (known after apply)
+      [32m+[0m[0m memory      = 4096
+      [32m+[0m[0m name        = "ruo-vm"
+      [32m+[0m[0m qemu_agent  = false
+      [32m+[0m[0m running     = true
+      [32m+[0m[0m type        = "qemu"
+      [32m+[0m[0m vcpu        = 2
+
+      [32m+[0m[0m console {
+          [32m+[0m[0m source_host    = "127.0.0.1"
+          [32m+[0m[0m source_service = "0"
+          [32m+[0m[0m target_port    = "0"
+          [32m+[0m[0m target_type    = "serial"
+          [32m+[0m[0m type           = "pty"
+        }
+
+      [32m+[0m[0m cpu (known after apply)
+
+      [32m+[0m[0m disk {
+          [32m+[0m[0m scsi      = false
+          [32m+[0m[0m volume_id = (known after apply)
+          [32m+[0m[0m wwn       = (known after apply)
+        }
+
+      [32m+[0m[0m network_interface {
+          [32m+[0m[0m addresses      = (known after apply)
+          [32m+[0m[0m hostname       = (known after apply)
+          [32m+[0m[0m mac            = (known after apply)
+          [32m+[0m[0m network_id     = (known after apply)
+          [32m+[0m[0m network_name   = "default"
+          [32m+[0m[0m wait_for_lease = true
+        }
+
+      [32m+[0m[0m nvram (known after apply)
+    }
+
+[1m  # libvirt_volume.base[0m will be created
+[0m  [32m+[0m[0m resource "libvirt_volume" "base" {
+      [32m+[0m[0m format = "qcow2"
+      [32m+[0m[0m id     = (known after apply)
+      [32m+[0m[0m name   = "ruo-vm-base.qcow2"
+      [32m+[0m[0m pool   = "default"
+      [32m+[0m[0m size   = (known after apply)
+      [32m+[0m[0m source = "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
+    }
+
+[1m  # libvirt_volume.disk[0m will be created
+[0m  [32m+[0m[0m resource "libvirt_volume" "disk" {
+      [32m+[0m[0m base_volume_id = (known after apply)
+      [32m+[0m[0m format         = (known after apply)
+      [32m+[0m[0m id             = (known after apply)
+      [32m+[0m[0m name           = "ruo-vm-disk.qcow2"
+      [32m+[0m[0m pool           = "default"
+      [32m+[0m[0m size           = 26843545600
+    }
+
+[1mPlan:[0m [0m4 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  [32m+[0m[0m vm_addresses = (known after apply)
+  [32m+[0m[0m vm_name      = "ruo-vm"
+[0m[1mlibvirt_volume.base: Creating...[0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Creating...[0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [00m10s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [00m10s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [00m20s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [00m20s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [00m30s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [00m30s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [00m40s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [00m40s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [00m50s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [00m50s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [01m00s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [01m00s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [01m10s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [01m10s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [01m20s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [01m20s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [01m30s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [01m30s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [01m40s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [01m40s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [01m50s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [01m50s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [02m00s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [02m00s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [02m10s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [02m10s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [02m20s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [02m20s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [02m30s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [02m30s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [02m40s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [02m40s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [02m50s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [02m50s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [03m00s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [03m00s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [03m10s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [03m10s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [03m20s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [03m20s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [03m30s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [03m30s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [03m40s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [03m40s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [03m50s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [03m50s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [04m00s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [04m00s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [04m10s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [04m10s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [04m20s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [04m20s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [04m30s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [04m30s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [04m40s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [04m40s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [04m50s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [04m50s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Still creating... [05m00s elapsed][0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Still creating... [05m00s elapsed][0m[0m
+[0m[1mlibvirt_volume.base: Creation complete after 5m8s [id=/var/lib/libvirt/images/ruo-vm-base.qcow2][0m
+[0m[1mlibvirt_volume.disk: Creating...[0m[0m
+[0m[1mlibvirt_cloudinit_disk.init: Creation complete after 5m8s [id=/var/lib/libvirt/images/ruo-vm-init.iso;3ac49714-d0fd-471a-943f-ec21d791c917][0m
+[0m[1mlibvirt_volume.disk: Creation complete after 0s [id=/var/lib/libvirt/images/ruo-vm-disk.qcow2][0m
+[0m[1mlibvirt_domain.vm: Creating...[0m[0m
+[0m[1mlibvirt_domain.vm: Still creating... [00m10s elapsed][0m[0m
+[0m[1mlibvirt_domain.vm: Still creating... [00m20s elapsed][0m[0m
+[0m[1mlibvirt_domain.vm: Still creating... [00m30s elapsed][0m[0m
+[0m[1mlibvirt_domain.vm: Still creating... [00m40s elapsed][0m[0m
+[0m[1mlibvirt_domain.vm: Still creating... [00m50s elapsed][0m[0m
+[0m[1mlibvirt_domain.vm: Still creating... [01m00s elapsed][0m[0m
+[0m[1mlibvirt_domain.vm: Still creating... [01m10s elapsed][0m[0m
+[0m[1mlibvirt_domain.vm: Creation complete after 1m16s [id=2a4bcb8a-3658-4b03-b635-7545d04f40e5][0m
+[0m[1m[32m
+Apply complete! Resources: 4 added, 0 changed, 0 destroyed.[0m
+[0m[1m[32m
+Outputs:
+
+[0mvm_addresses = tolist([
+  "192.168.122.248",
+])
+vm_name = "ruo-vm"
+bash scripts/prepare-access.sh
+Adresa masine: 192.168.122.248
+Ansible inventory i DNS adresa su azurirani
+ruo-vm | SUCCESS => {
+    "changed": false,
+    "elapsed": 40
+}
+make[1]: Leaving directory '/home/medina/ruo-projekat'
+make config
+make[1]: Entering directory '/home/medina/ruo-projekat'
+ansible-galaxy collection install -r ansible/requirements.yml
+Starting galaxy collection install process
+Nothing to do. All requested collections are already installed. If you want to reinstall them, consider using `--force`.
+ansible-playbook -i ansible/inventory.ini ansible/site.yml --skip-tags app
+
+PLAY [Pripremi server za aplikaciju] *******************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [ruo-vm]
+
+TASK [docker : Instaliraj Docker i Compose] ************************************
+changed: [ruo-vm]
+
+TASK [docker : Pokreni Docker i ukljuci automatsko pokretanje] *****************
+ok: [ruo-vm]
+
+TASK [dns : Instaliraj BIND i DNS alate] ***************************************
+changed: [ruo-vm]
+
+TASK [dns : Pokreni BIND i ukljuci automatsko pokretanje] **********************
+ok: [ruo-vm]
+
+TASK [dns : Postavi osnovne DNS opcije] ****************************************
+changed: [ruo-vm]
+
+TASK [dns : Napravi pocetni fajl DNS zone] *************************************
+changed: [ruo-vm]
+
+TASK [dns : Generisi TSIG kljuc samo ako ne postoji] ***************************
+changed: [ruo-vm]
+
+TASK [dns : Postavi dozvole za TSIG kljuc] *************************************
+changed: [ruo-vm]
+
+TASK [dns : Registruj DNS zonu] ************************************************
+changed: [ruo-vm]
+
+TASK [dns : Provjeri BIND konfiguraciju] ***************************************
+ok: [ruo-vm]
+
+TASK [dns : Provjeri DNS zonu] *************************************************
+ok: [ruo-vm]
+
+TASK [dns : Ukloni kljuc napravljen na pogresnoj putanji] **********************
+ok: [ruo-vm]
+
+TASK [dns : Napravi lokalni folder za tajne] ***********************************
+ok: [ruo-vm -> localhost]
+
+TASK [dns : Preuzmi TSIG kljuc za Terraform] ***********************************
+changed: [ruo-vm]
+
+TASK [dns : Zastiti lokalni TSIG kljuc] ****************************************
+ok: [ruo-vm -> localhost]
+
+RUNNING HANDLER [dns : Restartuj BIND] *****************************************
+changed: [ruo-vm]
+
+PLAY RECAP *********************************************************************
+ruo-vm                     : ok=17   changed=9    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
+make[1]: Leaving directory '/home/medina/ruo-projekat'
+make dns
+make[1]: Entering directory '/home/medina/ruo-projekat'
+terraform -chdir=terraform/dns init -input=false
+[0m[1mInitializing the backend...[0m
+
+[0m[1mInitializing provider plugins...[0m
+- Reusing version 3.6.2 of hashicorp/dns from the dependency lock file
+- Using previously-installed hashicorp/dns v3.6.2
+
+[0m[1m[32mTerraform has been successfully initialized![0m[32m[0m
+[0m[32m
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.[0m
+terraform -chdir=terraform/dns apply -auto-approve -input=false
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [32m+[0m create[0m
+
+Terraform will perform the following actions:
+
+[1m  # dns_a_record_set.services["api"][0m will be created
+[0m  [32m+[0m[0m resource "dns_a_record_set" "services" {
+      [32m+[0m[0m addresses = [
+          [32m+[0m[0m "172.28.20.20",
+        ]
+      [32m+[0m[0m id        = (known after apply)
+      [32m+[0m[0m name      = "api"
+      [32m+[0m[0m ttl       = 300
+      [32m+[0m[0m zone      = "ruo.test."
+    }
+
+[1m  # dns_a_record_set.services["db"][0m will be created
+[0m  [32m+[0m[0m resource "dns_a_record_set" "services" {
+      [32m+[0m[0m addresses = [
+          [32m+[0m[0m "172.28.30.20",
+        ]
+      [32m+[0m[0m id        = (known after apply)
+      [32m+[0m[0m name      = "db"
+      [32m+[0m[0m ttl       = 300
+      [32m+[0m[0m zone      = "ruo.test."
+    }
+
+[1m  # dns_a_record_set.services["web"][0m will be created
+[0m  [32m+[0m[0m resource "dns_a_record_set" "services" {
+      [32m+[0m[0m addresses = [
+          [32m+[0m[0m "192.168.122.248",
+        ]
+      [32m+[0m[0m id        = (known after apply)
+      [32m+[0m[0m name      = "web"
+      [32m+[0m[0m ttl       = 300
+      [32m+[0m[0m zone      = "ruo.test."
+    }
+
+[1mPlan:[0m [0m3 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  [32m+[0m[0m service_names = [
+      [32m+[0m[0m "api.ruo.test",
+      [32m+[0m[0m "db.ruo.test",
+      [32m+[0m[0m "web.ruo.test",
+    ]
+[0m[1mdns_a_record_set.services["api"]: Creating...[0m[0m
+[0m[1mdns_a_record_set.services["db"]: Creating...[0m[0m
+[0m[1mdns_a_record_set.services["web"]: Creating...[0m[0m
+[0m[1mdns_a_record_set.services["web"]: Creation complete after 1s [id=web.ruo.test.][0m
+[0m[1mdns_a_record_set.services["db"]: Creation complete after 1s [id=db.ruo.test.][0m
+[0m[1mdns_a_record_set.services["api"]: Creation complete after 1s [id=api.ruo.test.][0m
+[0m[1m[32m
+Apply complete! Resources: 3 added, 0 changed, 0 destroyed.[0m
+[0m[1m[32m
+Outputs:
+
+[0mservice_names = [
+  "api.ruo.test",
+  "db.ruo.test",
+  "web.ruo.test",
+]
+make[1]: Leaving directory '/home/medina/ruo-projekat'
+make deploy
+make[1]: Entering directory '/home/medina/ruo-projekat'
+ansible-playbook -i ansible/inventory.ini ansible/site.yml --tags app
+
+PLAY [Pripremi server za aplikaciju] *******************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [ruo-vm]
+
+TASK [app : Napravi direktorij aplikacije] *************************************
+changed: [ruo-vm]
+
+TASK [app : Prenesi aplikaciju na server] **************************************
+changed: [ruo-vm]
+
+TASK [app : Generisi i postavi konfiguraciju aplikacije] ***********************
+changed: [ruo-vm]
+
+TASK [app : Izgradi slike i pokreni aplikaciju] ********************************
+[WARNING]: Docker compose: unknown None: Docker Compose is configured to build using Bake, but buildx isn't installed
+changed: [ruo-vm]
+
+PLAY RECAP *********************************************************************
+ruo-vm                     : ok=5    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
+make[1]: Leaving directory '/home/medina/ruo-projekat'
+make test
+make[1]: Entering directory '/home/medina/ruo-projekat'
+mkdir -p tests/results
+bash tests/isolation.sh "$(cat .runtime/vm-ip)" | tee tests/results/isolation.txt
+Provjera: backend -> baza
+USPJEH: backend pristupa bazi
+Provjera: frontend -> baza
+DNS adresa baze: 172.28.30.20
+USPJEH: frontend nema pristup bazi
+Provjera: backend i baza nemaju objavljene portove
+USPJEH: svi testovi izolacije su prosli
+bash tests/services.sh "$(cat .runtime/vm-ip)" | tee tests/results/services.txt
+USPJEH: api.ruo.test -> 172.28.20.20
+USPJEH: db.ruo.test -> 172.28.30.20
+USPJEH: web.ruo.test -> 192.168.122.248
+USPJEH: frontend odgovara
+USPJEH: API vraca JSON listu korisnika
+USPJEH: svi testovi servisa su prosli
+make[1]: Leaving directory '/home/medina/ruo-projekat'

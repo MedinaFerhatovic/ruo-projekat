@@ -1,0 +1,5 @@
+---
+- name: Restartuj BIND
+  ansible.builtin.service:
+    name: named
+    state: restarted

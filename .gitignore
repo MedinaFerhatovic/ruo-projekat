@@ -17,3 +17,8 @@ vault.yml
 # Diskovi virtuelnih masina
 *.qcow2
 *.iso
+
+# Automatski generisane lokalne postavke
+.runtime/
+ansible/inventory.ini
+terraform/dns/runtime.auto.tfvars.json

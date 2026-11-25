@@ -1,0 +1,10 @@
+include "/etc/bind/ruo-tf.key";
+
+zone "ruo.test" {
+    type primary;
+    file "/var/lib/bind/db.ruo.test";
+
+    update-policy {
+        grant ruo-tf. zonesub A CNAME TXT;
+    };
+};

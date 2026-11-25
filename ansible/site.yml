@@ -1,0 +1,12 @@
+---
+- name: Pripremi server za aplikaciju
+  hosts: servers
+  become: true
+
+  roles:
+    - docker
+    - dns
+
+    - role: app
+      tags:
+        - app

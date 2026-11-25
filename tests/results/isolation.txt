@@ -1,0 +1,7 @@
+Provjera: backend -> baza
+USPJEH: backend pristupa bazi
+Provjera: frontend -> baza
+DNS adresa baze: 172.28.30.20
+USPJEH: frontend nema pristup bazi
+Provjera: backend i baza nemaju objavljene portove
+USPJEH: svi testovi izolacije su prosli
